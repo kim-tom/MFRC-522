@@ -6,9 +6,35 @@ import json
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
-rc522 = RFID()
+
+class MY_RFID(RFID):
+    def wait_for_tag(self, timeout=0):
+        # enable IRQ on detect
+        self.init()
+        self.irq.clear()
+        self.dev_write(0x04, 0x00)
+        self.dev_write(0x02, 0xA0)
+        # wait for it
+        waiting = True
+        start_time = time.time()
+        while waiting:
+            self.init()
+            #self.irq.clear()
+            self.dev_write(0x04, 0x00)
+            self.dev_write(0x02, 0xA0)
+
+            self.dev_write(0x09, 0x26)
+            self.dev_write(0x01, 0x0C)
+            self.dev_write(0x0D, 0x87)
+            waiting = not self.irq.wait(0.1)
+            if timeout > 0 and (time.time() - start_time) > timeout:
+                break
+        self.irq.clear()
+        self.init()
+
+rc522 = MY_RFID()
 def get_RFID():
-    rc522.wait_for_tag()
+    rc522.wait_for_tag(0.1)
     (error, tag_type) = rc522.request()
     if not error :
         (error, uid) = rc522.anticoll()
