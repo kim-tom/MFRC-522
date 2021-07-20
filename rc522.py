@@ -28,6 +28,7 @@ class MY_RFID(RFID):
             self.dev_write(0x0D, 0x87)
             waiting = not self.irq.wait(0.1)
             if timeout > 0 and (time.time() - start_time) > timeout:
+                print("timeout!")
                 break
         self.irq.clear()
         self.init()
@@ -38,10 +39,11 @@ def get_RFID():
     (error, tag_type) = rc522.request()
     if not error :
         (error, uid) = rc522.anticoll()
-    if not error :
+        rc522.reset()
         return uid
     else:
-        return 0
+        rc522.reset()
+        return [0xFF, 0xFF, 0xFF, 0xFF, 0xFF]
 def app(environ, start_response):
   status = '200 OK'
   headers = [
