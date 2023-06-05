@@ -31,8 +31,8 @@ class RC522(RFID):
         GPIO.output(self.pin_rst, 1)
     def power_off(self):
         GPIO.output(self.pin_rst, 0)
-    def get_RFID(self):
-        self.wait_for_tag(0.1)
+    def get_RFID(self, timeout=0):
+        self.wait_for_tag(timeout)
         (error, tag_type) = self.request()
         if not error :
             (error, uid) = self.anticoll()

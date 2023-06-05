@@ -8,7 +8,7 @@ app = FastAPI()
 
 @app.get("/")
 def get_id():
-   id_ = rc522.get_RFID()
+   id_ = rc522.get_RFID(0.1)
    if int(time.time()) % 600 == 0:
       rc522.power_off()
       print("Reset Started.")
